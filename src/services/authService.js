@@ -55,7 +55,7 @@ const authService = {
     return httpRequest.post(url, data);
   },
   jobSeekerRegister: (data) => {
-    const url = 'api/v1/auth/job-seeker/register/';
+    const url = 'api/auth/job-seeker/register/';
 
     return httpRequest.post(url, data);
   },
