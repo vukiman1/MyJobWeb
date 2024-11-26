@@ -60,7 +60,7 @@ const AUTH_CONFIG = {
   },
   EMPLOYER_BOT: {
     AGENT_ID: process.env.EMPLOYER_BOT_AGENT_ID ||
-    '65579934-5470-4970-95cc-40b1bacbb942',,
+    '65579934-5470-4970-95cc-40b1bacbb942',
     CHAT_TITLE: 'MyJob AI',
     CHAT_ICON: 'https://res.cloudinary.com/dtnpj540t/image/upload/v1705747491/my-job/system-images/employer-chatbot-icon.png',
   },
