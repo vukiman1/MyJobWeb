@@ -1,8 +1,8 @@
-import * as React from 'react';
-import { useTheme } from '@mui/material/styles';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { PDFDownloadLink } from '@react-pdf/renderer';
+import * as React from "react";
+import { useTheme } from "@mui/material/styles";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 
 import {
   Box,
@@ -14,34 +14,34 @@ import {
   Divider,
   Tooltip,
   Skeleton,
-} from '@mui/material';
-import dayjs from 'dayjs';
+} from "@mui/material";
+import dayjs from "dayjs";
 
-import HelpIcon from '@mui/icons-material/Help';
-import StarOutlineIcon from '@mui/icons-material/StarOutline';
-import StarIcon from '@mui/icons-material/Star';
-import EditIcon from '@mui/icons-material/Edit';
-import DownloadIcon from '@mui/icons-material/Download';
+import HelpIcon from "@mui/icons-material/Help";
+import StarOutlineIcon from "@mui/icons-material/StarOutline";
+import StarIcon from "@mui/icons-material/Star";
+import EditIcon from "@mui/icons-material/Edit";
+import DownloadIcon from "@mui/icons-material/Download";
 import {
   faCalendar,
   faDollarSign,
   faMagicWandSparkles,
   faUser,
   faWarning,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { CV_TYPES } from '../../../../configs/constants';
-import BackdropLoading from '../../../../components/loading/BackdropLoading';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
-import MuiImageCustom from '../../../../components/MuiImageCustom';
-import toSlug, { salaryString } from '../../../../utils/customData';
-import NoDataCard from '../../../../components/NoDataCard';
-import CVDoc from '../../../../components/CVDoc';
-import { reloadResume } from '../../../../redux/profileSlice';
-import jobSeekerProfileService from '../../../../services/jobSeekerProfileService';
-import resumeService from '../../../../services/resumeService';
+import { CV_TYPES } from "../../../../configs/constants";
+import BackdropLoading from "../../../../components/loading/BackdropLoading";
+import toastMessages from "../../../../utils/toastMessages";
+import errorHandling from "../../../../utils/errorHandling";
+import MuiImageCustom from "../../../../components/MuiImageCustom";
+import toSlug, { salaryString } from "../../../../utils/customData";
+import NoDataCard from "../../../../components/NoDataCard";
+import CVDoc from "../../../../components/CVDoc";
+import { reloadResume } from "../../../../redux/profileSlice";
+import jobSeekerProfileService from "../../../../services/jobSeekerProfileService";
+import resumeService from "../../../../services/resumeService";
 
 const Loading = () => {
   return (
@@ -52,11 +52,11 @@ const Loading = () => {
           <Box
             sx={{
               display: {
-                xs: 'none',
-                sm: 'none',
-                md: 'none',
-                lg: 'none',
-                xl: 'none',
+                xs: "none",
+                sm: "none",
+                md: "none",
+                lg: "none",
+                xl: "none",
               },
             }}
           >
@@ -112,7 +112,7 @@ const BoxProfile = ({ title }) => {
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
   const [resume, setResume] = React.useState(null);
-
+  console.log(resume);
   React.useEffect(() => {
     const getOnlineProfile = async (jobSeekerProfileId, params) => {
       setIsLoadingResume(true);
@@ -121,7 +121,6 @@ const BoxProfile = ({ title }) => {
           jobSeekerProfileId,
           params
         );
-
         setResume(resData.data);
       } catch (error) {
       } finally {
@@ -141,7 +140,7 @@ const BoxProfile = ({ title }) => {
         await resumeService.activeResume(resumeSlug);
 
         dispatch(reloadResume());
-        toastMessages.success('Thay đổi trạng thái hồ sơ thành công.');
+        toastMessages.success("Thay đổi trạng thái hồ sơ thành công.");
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -158,19 +157,19 @@ const BoxProfile = ({ title }) => {
         <Box>
           <Stack
             direction={{
-              xs: 'column',
-              sm: 'row',
-              md: 'row',
-              lg: 'row',
-              xl: 'row',
+              xs: "column",
+              sm: "row",
+              md: "row",
+              lg: "row",
+              xl: "row",
             }}
             justifyContent="space-between"
             alignItems={{
-              xs: 'flex-start',
-              sm: 'center',
-              md: 'center',
-              lg: 'center',
-              xl: 'center',
+              xs: "flex-start",
+              sm: "center",
+              md: "center",
+              lg: "center",
+              xl: "center",
             }}
           >
             <Typography variant="h6" textAlign="left">
@@ -179,6 +178,7 @@ const BoxProfile = ({ title }) => {
 
             {resume != null && (
               <Stack direction="row" spacing={1} alignItems="center">
+                {console.log(resume)}
                 <Stack direction="row">
                   {resume.isActive ? (
                     <Chip
@@ -207,12 +207,12 @@ const BoxProfile = ({ title }) => {
                 </Stack>
                 <PDFDownloadLink
                   document={<CVDoc />}
-                  fileName={`MyJob_CV-${toSlug(resume?.title || 'title')}.pdf`}
-                  style={{ textDecoration: 'none' }}
+                  fileName={`MyJob_CV-${toSlug(resume?.title || "title")}.pdf`}
+                  style={{ textDecoration: "none" }}
                 >
                   {() => (
                     <Chip
-                      sx={{ ml: 1, color: 'white' }}
+                      sx={{ ml: 1, color: "white" }}
                       size="small"
                       icon={<DownloadIcon />}
                       color="secondary"
@@ -241,25 +241,25 @@ const BoxProfile = ({ title }) => {
                     width={130}
                     height={130}
                     src={resume?.user?.avatarUrl}
-                    sx={{ borderRadius: '50%' }}
+                    sx={{ borderRadius: "50%" }}
                   />
                   <Box
                     sx={{
                       display: {
-                        xs: 'block',
-                        sm: 'block',
-                        md: 'none',
-                        lg: 'none',
-                        xl: 'none',
+                        xs: "block",
+                        sm: "block",
+                        md: "none",
+                        lg: "none",
+                        xl: "none",
                       },
                     }}
                   >
                     <Typography
                       variant="h6"
                       sx={{
-                        textTransform: 'uppercase',
+                        textTransform: "uppercase",
                         fontSize: 20,
-                        fontWeight: 'bold',
+                        fontWeight: "bold",
                       }}
                     >
                       {resume?.user?.fullName}
@@ -272,8 +272,8 @@ const BoxProfile = ({ title }) => {
                       {resume.title || (
                         <span
                           style={{
-                            color: '#e0e0e0',
-                            fontStyle: 'italic',
+                            color: "#e0e0e0",
+                            fontStyle: "italic",
                             fontSize: 13,
                           }}
                         >
@@ -291,11 +291,11 @@ const BoxProfile = ({ title }) => {
                     xs={12}
                     sx={{
                       display: {
-                        xs: 'none',
-                        sm: 'none',
-                        md: 'block',
-                        lg: 'block',
-                        xl: 'block',
+                        xs: "none",
+                        sm: "none",
+                        md: "block",
+                        lg: "block",
+                        xl: "block",
                       },
                     }}
                   >
@@ -303,9 +303,9 @@ const BoxProfile = ({ title }) => {
                       <Typography
                         variant="h6"
                         sx={{
-                          textTransform: 'uppercase',
+                          textTransform: "uppercase",
                           fontSize: 20,
-                          fontWeight: 'bold',
+                          fontWeight: "bold",
                         }}
                       >
                         {resume?.user?.fullName}
@@ -315,16 +315,16 @@ const BoxProfile = ({ title }) => {
                         sx={{
                           fontSize: 16,
                           color:
-                            theme.palette.mode === 'light'
-                              ? '#121212'
-                              : 'white',
+                            theme.palette.mode === "light"
+                              ? "#121212"
+                              : "white",
                         }}
                       >
                         {resume.title || (
                           <span
                             style={{
-                              color: '#e0e0e0',
-                              fontStyle: 'italic',
+                              color: "#e0e0e0",
+                              fontStyle: "italic",
                               fontSize: 13,
                             }}
                           >
@@ -335,26 +335,26 @@ const BoxProfile = ({ title }) => {
                     </Box>
                   </Grid>
                   <Grid item xs={12}>
-                    <Typography sx={{ color: 'gray' }}>
+                    <Typography sx={{ color: "gray" }}>
                       <FontAwesomeIcon
                         icon={faMagicWandSparkles}
                         style={{ marginRight: 10 }}
                       />
-                      Kinh nghiệm:{' '}
+                      Kinh nghiệm:{" "}
                       <span
                         style={{
                           color:
-                            theme.palette.mode === 'light'
-                              ? '#121212'
-                              : 'white',
-                          fontWeight: 'bold',
+                            theme.palette.mode === "light"
+                              ? "#121212"
+                              : "white",
+                          fontWeight: "bold",
                         }}
                       >
                         {allConfig.experienceDict[resume.experience] || (
                           <span
                             style={{
-                              color: '#e0e0e0',
-                              fontStyle: 'italic',
+                              color: "#e0e0e0",
+                              fontStyle: "italic",
                               fontSize: 13,
                             }}
                           >
@@ -365,26 +365,26 @@ const BoxProfile = ({ title }) => {
                     </Typography>
                   </Grid>
                   <Grid item xs={12}>
-                    <Typography sx={{ color: 'gray' }}>
+                    <Typography sx={{ color: "gray" }}>
                       <FontAwesomeIcon
                         icon={faUser}
                         style={{ marginRight: 10 }}
                       />
-                      Cấp bậc:{' '}
+                      Cấp bậc:{" "}
                       <span
                         style={{
                           color:
-                            theme.palette.mode === 'light'
-                              ? '#121212'
-                              : 'white',
-                          fontWeight: 'bold',
+                            theme.palette.mode === "light"
+                              ? "#121212"
+                              : "white",
+                          fontWeight: "bold",
                         }}
                       >
                         {allConfig.positionDict[resume.position] || (
                           <span
                             style={{
-                              color: '#e0e0e0',
-                              fontStyle: 'italic',
+                              color: "#e0e0e0",
+                              fontStyle: "italic",
                               fontSize: 13,
                             }}
                           >
@@ -395,19 +395,19 @@ const BoxProfile = ({ title }) => {
                     </Typography>
                   </Grid>
                   <Grid item xs={12}>
-                    <Typography sx={{ color: 'gray' }}>
+                    <Typography sx={{ color: "gray" }}>
                       <FontAwesomeIcon
                         icon={faDollarSign}
                         style={{ marginRight: 10 }}
                       />
-                      Mức lương mong muốn:{' '}
+                      Mức lương mong muốn:{" "}
                       <span
                         style={{
                           color:
-                            theme.palette.mode === 'light'
-                              ? '#121212'
-                              : 'white',
-                          fontWeight: 'bold',
+                            theme.palette.mode === "light"
+                              ? "#121212"
+                              : "white",
+                          fontWeight: "bold",
                         }}
                       >
                         {salaryString(resume.salaryMin, resume.salaryMax)}
@@ -415,22 +415,22 @@ const BoxProfile = ({ title }) => {
                     </Typography>
                   </Grid>
                   <Grid item xs={12}>
-                    <Typography sx={{ color: 'gray' }}>
+                    <Typography sx={{ color: "gray" }}>
                       <FontAwesomeIcon
                         icon={faCalendar}
                         style={{ marginRight: 10 }}
                       />
-                      Ngày cập nhật:{' '}
+                      Ngày cập nhật:{" "}
                       <span
                         style={{
                           color:
-                            theme.palette.mode === 'light'
-                              ? '#121212'
-                              : 'white',
-                          fontWeight: 'bold',
+                            theme.palette.mode === "light"
+                              ? "#121212"
+                              : "white",
+                          fontWeight: "bold",
                         }}
                       >
-                        {dayjs(resume.updateAt).format('DD/MM/YYYY HH:mm:ss')}
+                        {dayjs(resume.updateAt).format("DD/MM/YYYY HH:mm:ss")}
                       </span>
                     </Typography>
                   </Grid>

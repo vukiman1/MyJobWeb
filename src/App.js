@@ -119,7 +119,7 @@ function App() {
             MuiCssBaseline: {
               styleOverrides: {
                 body: {
-                  scrollbarColor: '#441da0 #fff',
+                  // scrollbarColor: '#441da0 #fff',
                   '&::-webkit-scrollbar, & *::-webkit-scrollbar': {
                     backgroundColor: '#fff',
                   },

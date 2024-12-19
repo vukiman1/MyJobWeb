@@ -218,7 +218,7 @@ const drawer = (location, theme) => (
           >
             <StyledTreeItem
               nodeId="11"
-              labelText="MyJob thông báo"
+              labelText="Thông báo mới"
               labelIcon={NotificationsNoneOutlinedIcon}
             />
           </NavLink>

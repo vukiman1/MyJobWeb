@@ -34,7 +34,7 @@ const tabItems = [
   },
   {
     id: 5,
-    label: "MyJob thông báo",
+    label: "Thông báo mới",
     icon: <CircleNotificationsIcon />,
     path: "/ung-vien/thong-bao",
   },

@@ -1,8 +1,8 @@
-import * as React from 'react';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import Moment from 'react-moment';
-import 'moment/locale/vi';
+import * as React from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import Moment from "react-moment";
+import "moment/locale/vi";
 import {
   Badge,
   Box,
@@ -11,10 +11,12 @@ import {
   Menu,
   Stack,
   Typography,
-} from '@mui/material';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import ClearIcon from '@mui/icons-material/Clear';
+} from "@mui/material";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import ClearIcon from "@mui/icons-material/Clear";
 
+// Comment out Firebase imports
+/*
 import {
   collection,
   getDocs,
@@ -29,9 +31,10 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 import db from '../../configs/firebase-config';
+*/
 
-import { IMAGES } from '../../configs/constants';
-import MuiImageCustom from '../MuiImageCustom';
+import { IMAGES } from "../../configs/constants";
+import MuiImageCustom from "../MuiImageCustom";
 
 const PAGE_SIZE = 5;
 
@@ -49,204 +52,85 @@ const NotificationCard = () => {
     setAnchorEl(event.currentTarget);
   };
 
+  
   const handleClose = () => {
     setAnchorEl(null);
   };
 
   React.useEffect(() => {
-    const notificationsRef = collection(
-      db,
-      'users',
-      `${currentUser.id}`,
-      'notifications'
-    );
-    const allQuery = query(
-      notificationsRef,
-      where('is_deleted', '==', false),
-      where('is_read', '==', false)
-    );
-
-    const unsubscribe = onSnapshot(allQuery, (querySnapshot) => {
-      let total = 0;
-      querySnapshot.forEach((doc) => {
-        total = total + 1;
-      });
-      setBadgeCount(total);
-    });
-
-    return () => {
-      unsubscribe();
-    };
+    // Giả lập số thông báo chưa đọc
+    setBadgeCount(0);
+    return () => {};
   }, [currentUser.id]);
 
   React.useEffect(() => {
-    const notificationsRef = collection(
-      db,
-      'users',
-      `${currentUser.id}`,
-      'notifications'
-    );
-    const allQuery = query(notificationsRef, where('is_deleted', '==', false));
-
-    const unsubscribe = onSnapshot(allQuery, (querySnapshot) => {
-      let total = 0;
-      querySnapshot.forEach((doc) => {
-        total = total + 1;
-      });
-      setCount(total);
-    });
-
-    return () => {
-      unsubscribe();
-    };
+    // Giả lập tổng số thông báo
+    setCount(0);
+    return () => {};
   }, [currentUser.id]);
 
   React.useEffect(() => {
-    const notificationsRef = collection(
-      db,
-      'users',
-      `${currentUser.id}`,
-      'notifications'
-    );
-    const first = query(
-      notificationsRef,
-      where('is_deleted', '==', false),
-      orderBy('time', 'desc'),
-      limit(PAGE_SIZE)
-    );
-
-    const unsubscribe = onSnapshot(first, (querySnapshot) => {
-      const notificationList = [];
-      querySnapshot.forEach((doc) => {
-        notificationList.push({
-          ...doc.data(),
-          key: doc.id,
-        });
-      });
-      setNotifications(notificationList);
-      setLastKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
-
-      return () => {
-        unsubscribe();
-      };
-    });
+    // Giả lập danh sách thông báo rỗng
+    setNotifications([]);
+    setLastKey(null);
+    return () => {};
   }, [currentUser.id]);
 
   const loadMore = async () => {
-    const notificationsRef = collection(
-      db,
-      'users',
-      `${currentUser.id}`,
-      'notifications'
-    );
-    const nextQuery = query(
-      notificationsRef,
-      where('is_deleted', '==', false),
-      orderBy('time', 'desc'),
-      startAfter(lastKey),
-      limit(PAGE_SIZE)
-    );
-
-    const nextNotificationList = [];
-    const nextQuerySnapshot = await getDocs(nextQuery);
-    const lastVisible =
-      nextQuerySnapshot.docs[nextQuerySnapshot.docs.length - 1];
-
-    nextQuerySnapshot.forEach((doc) => {
-      nextNotificationList.push({
-        ...doc.data(),
-        key: doc.id,
-      });
-    });
-
-    setNotifications([...notifications, ...nextNotificationList]);
-    setLastKey(lastVisible);
+    // Không làm gì cả
+    console.log("Load more disabled");
   };
 
   const handleRemove = (key) => {
-    updateDoc(doc(db, 'users', `${currentUser.id}`, 'notifications', key), {
-      is_deleted: true,
-    })
-      .then(() => {
-        const index = notifications.findIndex((value) => value.key === key);
-        if (index > -1) {
-          let newNotifications = [...notifications];
-          newNotifications.splice(index, 1);
-          setNotifications(newNotifications);
-        }
-      })
-      .catch((error) => {
-        console.log('deleted noti failed: ', error);
-      });
+    // Xóa thông báo khỏi state local
+    const index = notifications.findIndex((value) => value.key === key);
+    if (index > -1) {
+      let newNotifications = [...notifications];
+      newNotifications.splice(index, 1);
+      setNotifications(newNotifications);
+    }
   };
 
   const handleRead = (key) => {
-    updateDoc(doc(db, 'users', `${currentUser.id}`, 'notifications', key), {
-      is_read: true,
-    })
-      .then(() => {})
-      .catch((error) => {
-        console.log('read noti failed: ', error);
-      });
+    // Không làm gì cả
+    console.log("Read notification disabled");
   };
 
   const handleRemoveAll = async () => {
-    // Get a reference to the notifications collection
-    const notificationsRef = collection(
-      db,
-      'users',
-      `${currentUser.id}`,
-      'notifications'
-    );
-    const deleteQuery = query(
-      notificationsRef,
-      where('is_deleted', '==', false)
-    );
-    const querySnapshot = await getDocs(deleteQuery);
-
-    // Create a batch write operation
-    const batch = writeBatch(db);
-
-    // Iterate over all documents and add them to the batch
-    querySnapshot.forEach((doc) => {
-      const docRef = doc.ref;
-      batch.update(docRef, { is_deleted: true });
-    });
-
-    // Commit the batch write operation
-    await batch.commit();
+    // Xóa tất cả thông báo khỏi state local
+    setNotifications([]);
   };
 
   const handleClickItem = (item) => {
     switch (item.type) {
-      case 'SYSTEM':
+      case "SYSTEM":
         handleRead(item.key);
-        nav('/');
+        nav("/");
         break;
-      case 'EMPLOYER_VIEWED_RESUME':
+      case "EMPLOYER_VIEWED_RESUME":
         handleRead(item.key);
-        nav('/ung-vien/cong-ty-cua-toi');
+        nav("/ung-vien/cong-ty-cua-toi");
         break;
-      case 'EMPLOYER_SAVED_RESUME':
+      case "EMPLOYER_SAVED_RESUME":
         handleRead(item.key);
-        nav('/ung-vien/cong-ty-cua-toi');
+        nav("/ung-vien/cong-ty-cua-toi");
         break;
-      case 'APPLY_STATUS':
+      case "APPLY_STATUS":
         handleRead(item.key);
-        nav('/ung-vien/viec-lam-cua-toi');
+        nav("/ung-vien/viec-lam-cua-toi");
         break;
-      case 'COMPANY_FOLLOWED':
+      case "COMPANY_FOLLOWED":
         handleRead(item.key);
-        nav('/nha-tuyen-dung/danh-sach-ung-vien');
+        nav("/nha-tuyen-dung/danh-sach-ung-vien");
         break;
-      case 'POST_VERIFY_RESULT':
+      case "POST_VERIFY_RESULT":
         handleRead(item.key);
-        nav('/nha-tuyen-dung/tin-tuyen-dung');
+        nav("/nha-tuyen-dung/tin-tuyen-dung");
         break;
-      case 'APPLY_JOB':
+      case "APPLY_JOB":
         handleRead(item.key);
         nav(
-          `/nha-tuyen-dung/chi-tiet-ung-vien/${item['APPLY_JOB']?.resume_slug}`
+          `/nha-tuyen-dung/chi-tiet-ung-vien/${item["APPLY_JOB"]?.resume_slug}`
         );
         break;
       default:
@@ -258,7 +142,7 @@ const NotificationCard = () => {
 
   return (
     <React.Fragment>
-      <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+      <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
         <IconButton
           size="large"
           aria-label="show new notifications"
@@ -278,34 +162,34 @@ const NotificationCard = () => {
         PaperProps={{
           elevation: 0,
           sx: {
-            overflow: 'visible',
-            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+            overflow: "visible",
+            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
             mt: 1.5,
-            '& .MuiAvatar-root': {
+            "& .MuiAvatar-root": {
               width: 32,
               height: 32,
               ml: -0.5,
               mr: 1,
             },
-            '&:before': {
+            "&:before": {
               content: '""',
-              display: 'block',
-              position: 'absolute',
+              display: "block",
+              position: "absolute",
               top: 0,
               right: 14,
               width: 10,
               height: 10,
-              bgcolor: 'background.paper',
-              transform: 'translateY(-50%) rotate(45deg)',
+              bgcolor: "background.paper",
+              transform: "translateY(-50%) rotate(45deg)",
               zIndex: 0,
             },
           },
         }}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         <Box style={{ width: 500, maxHeight: 500 }} sx={{ py: 1, px: 1.5 }}>
-          <Box style={{ overflowY: 'auto', maxHeight: 450 }}>
+          <Box style={{ overflowY: "auto", maxHeight: 450 }}>
             <Stack spacing={2} sx={{ p: 1 }}>
               {notifications.length === 0 ? (
                 <Typography textAlign="center" variant="body2" color="gray">
@@ -325,7 +209,7 @@ const NotificationCard = () => {
                     }}
                   >
                     <Box
-                      sx={{ cursor: 'pointer' }}
+                      sx={{ cursor: "pointer" }}
                       onClick={() => handleClickItem(value)}
                     >
                       <MuiImageCustom
@@ -337,13 +221,13 @@ const NotificationCard = () => {
                           borderRadius: 1.5,
                           maxHeight: 150,
                           border: 0.5,
-                          borderColor: '#d1c4e9',
+                          borderColor: "#d1c4e9",
                         }}
                         duration={500}
                       />
                     </Box>
                     <Box
-                      sx={{ cursor: 'pointer' }}
+                      sx={{ cursor: "pointer" }}
                       flex={1}
                       onClick={() => handleClickItem(value)}
                     >
@@ -354,7 +238,7 @@ const NotificationCard = () => {
                             fontSize={14}
                             style={{
                               fontWeight:
-                                value?.is_read === true ? 'normal' : 'bold',
+                                value?.is_read === true ? "normal" : "bold",
                             }}
                           >
                             {value.title}
@@ -377,9 +261,9 @@ const NotificationCard = () => {
                           </Typography>
                           <Typography variant="caption" fontSize={12}>
                             {value?.is_read === true ? (
-                              <span style={{ color: '#bdbdbd' }}>Đã đọc</span>
+                              <span style={{ color: "#bdbdbd" }}>Đã đọc</span>
                             ) : (
-                              <span style={{ color: 'red' }}>Mới</span>
+                              <span style={{ color: "red" }}>Mới</span>
                             )}
                           </Typography>
                         </Stack>
@@ -415,7 +299,7 @@ const NotificationCard = () => {
                       textAlign="center"
                       color="GrayText"
                     >
-                      <span style={{ cursor: 'pointer' }} onClick={loadMore}>
+                      <span style={{ cursor: "pointer" }} onClick={loadMore}>
                         Xem thêm
                       </span>
                     </Typography>
@@ -431,7 +315,7 @@ const NotificationCard = () => {
                       textAlign="center"
                     >
                       <span
-                        style={{ cursor: 'pointer' }}
+                        style={{ cursor: "pointer" }}
                         onClick={handleRemoveAll}
                       >
                         Xóa tất cả

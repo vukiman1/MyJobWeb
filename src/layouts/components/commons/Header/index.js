@@ -78,7 +78,7 @@ const Header = (props) => {
           p: 0.5,
           borderRadius: 50,
           backgroundColor: "transparent",
-          borderColor: "#7e57c2",
+          borderColor: "#8d94ef",
           cursor: "pointer",
         }}
       >

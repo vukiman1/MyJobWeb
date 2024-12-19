@@ -28,6 +28,7 @@ const CompanyImageCard = () => {
           });
         }
         setFileList(newResults);
+        console.log(newResults);
       } catch (error) {
         console.log(error)
       }  
@@ -42,16 +43,16 @@ const CompanyImageCard = () => {
       setIsFullScreenLoading(true);
       try {
         const resData = await companyImageService.addCompanyImage(data);
-        const results = resData.data;
+        const results = resData.data.results;
+        const newResults = results.map((image) => ({
+          uid: image.id,
+          url: image.imageUrl,
+      }));
+      
+      // Cập nhật fileList với danh sách ảnh mới
+      console.log(newResults);
+      setFileList(newResults);
 
-        let newResults = [];
-        for (let i = 0; i < results.length; i++) {
-          newResults.push({
-            uid: results[i].id,
-            url: results[i].imageUrl,
-          });
-        }
-        setFileList([...fileList, ...newResults]);
         toastMessages.success('Tải ảnh lên thành công.');
       } catch (error) {
         errorHandling(error);

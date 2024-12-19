@@ -212,7 +212,7 @@ const Footer = () => {
                 gutterBottom
                 style={{ fontWeight: 'bold' }}
               >
-                Kết nối với MyJob
+                Kết nối với Việc làm 365
               </Typography>
             </ListItem>
             <ListItem>

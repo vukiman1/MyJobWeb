@@ -74,12 +74,12 @@ const ROLES_NAME = {
 
 const HOME_FILTER_CAREER = [
   {
-    id: 8,
+    id: 9,
     name: 'IT - Phần mềm',
     titleIcon: <DevicesIcon color="secondary" />,
   },
   {
-    id: 7,
+    id: 8,
     name: 'IT - Phần cứng',
     titleIcon: <DeveloperBoardIcon color="secondary" />,
   },
@@ -140,10 +140,10 @@ const LINKS = {
   CERTIFICATE_LINK: 'http://online.gov.vn/',
   INSTAGRAM_LINK: 'https://www.instagram.com/huybk2/',
   FACEBOOK_LINK: 'https://www.facebook.com/bkhuy/',
-  FACEBOOK_MESSENGER_LINK: 'https://www.facebook.com/bkhuy/',
-  LINKEDIN_LINK: 'https://www.linkedin.com/in/huy-khanh-10041b20b/',
-  TWITTER_LINK: 'https://twitter.com/HuyBuiKhanh',
-  YOUTUBE_LINK: 'https://www.youtube.com/channel/UCn49BvcP1w1mamaOSGTKVZw',
+  FACEBOOK_MESSENGER_LINK: 'https://www.facebook.com/vukiman1',
+  LINKEDIN_LINK: 'https://www.linkedin.com/in/vukiman1/',
+  TWITTER_LINK: 'https://twitter.com/kiman0102',
+  YOUTUBE_LINK: 'https://www.youtube.com',
 };
 
 const BANNER_TYPE = {
