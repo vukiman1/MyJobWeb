@@ -54,13 +54,13 @@ const AUTH_CONFIG = {
   JOB_SEEKER_BOT: {
     AGENT_ID:
       process.env.JOB_SEEKER_BOT_AGENT_ID ||
-      '1a0c784b-fda8-4ed7-94c9-7877fc79ec88',
+      '65579934-5470-4970-95cc-40b1bacbb942',
     CHAT_TITLE: 'MyJob AI',
     CHAT_ICON: 'https://res.cloudinary.com/dtnpj540t/image/upload/v1705727937/my-job/system-images/job-seeker-chatbot-icon.png',
   },
   EMPLOYER_BOT: {
     AGENT_ID: process.env.EMPLOYER_BOT_AGENT_ID ||
-    '',
+    '65579934-5470-4970-95cc-40b1bacbb942',
     CHAT_TITLE: 'MyJob AI',
     CHAT_ICON: 'https://res.cloudinary.com/dtnpj540t/image/upload/v1705747491/my-job/system-images/employer-chatbot-icon.png',
   },

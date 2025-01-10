@@ -8,7 +8,6 @@ const companyImageService = {
   },
   addCompanyImage: (data) => {
     const url = '/api/info/web/company-images/';
-
     return httpRequest.post(url, data, {
       headers: {
         'Content-Type': 'multipart/form-data',
