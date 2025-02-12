@@ -1,7 +1,5 @@
 import {
-  getFirestore,
   collection,
-  setDoc,
   doc,
   getDoc,
   addDoc,
@@ -10,64 +8,61 @@ import {
   getDocs,
   updateDoc,
   increment,
+  setDoc,
 } from 'firebase/firestore';
 import db, { serverTimestamp } from '../configs/firebase-config';
 
 export const addDocument = async (collectionName, data) => {
-  const query = collection(db, collectionName);
-
-  const docRef = await addDoc(query, {
-    ...data,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  });
-
-  console.log('Document written with ID: ', docRef.id);
-  return docRef.id;
+  try {
+    const collectionRef = collection(db, collectionName);
+    const docRef = await addDoc(collectionRef, {
+      ...data,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error('Error adding document:', error);
+    throw error;
+  }
 };
 
-export const updateChatRoomByPartnerId = (partnerId, chatRoomId) => {
-  const chatRoomDocRef = doc(db, 'chatRooms', `${chatRoomId}`);
-  updateDoc(chatRoomDocRef, {
-    recipientId: `${partnerId}`,
-    unreadCount: increment(1),
-    updatedAt: serverTimestamp(),
-  })
-    .then(() => {
-      console.log('update chatRoom success');
-    })
-    .catch((error) => {
-      console.log('update chatRoom failed: ', error);
+export const updateChatRoomByPartnerId = async (partnerId, chatRoomId) => {
+  try {
+    const chatRoomDocRef = doc(db, 'chatRooms', `${chatRoomId}`);
+    await updateDoc(chatRoomDocRef, {
+      recipientId: `${partnerId}`,
+      unreadCount: increment(1),
+      updatedAt: serverTimestamp(),
     });
+  } catch (error) {
+    console.error('Error updating chat room:', error);
+    throw error;
+  }
 };
 
 export const checkExists = async (collectionName, docId) => {
-  const firestore = getFirestore();
-  const documentRef = doc(firestore, collectionName, `${docId}`);
-
+  const documentRef = doc(db, collectionName, `${docId}`);
   const documentSnapshot = await getDoc(documentRef);
-
   return documentSnapshot.exists();
 };
 
 export const createUser = async (collectionName, userData, userId) => {
   try {
     const userRef = doc(db, collectionName, `${userId}`);
-
     await setDoc(userRef, {
       ...userData,
       createdAt: serverTimestamp(),
     });
     return true;
   } catch (error) {
+    console.error('Error creating user:', error);
     return false;
   }
 };
 
 export const checkChatRoomExists = async (collectionName, member1, member2) => {
-  const firestore = getFirestore();
-  const chatRoomsRef = collection(firestore, collectionName);
-
+  const chatRoomsRef = collection(db, collectionName);
   const q = query(
     chatRoomsRef,
     where('membersString', 'array-contains', `${member1}-${member2}`)
@@ -77,10 +72,9 @@ export const checkChatRoomExists = async (collectionName, member1, member2) => {
   if (querySnapshot.size > 0) {
     const roomId = querySnapshot.docs[0].id;
     return roomId;
-  } else {
-    console.log('Room does not exist');
-    return null;
   }
+  console.log('Room does not exist');
+  return null;
 };
 
 export const getChatRoomById = async (chatRoomId, currentUserId) => {
@@ -103,9 +97,8 @@ export const getChatRoomById = async (chatRoomId, currentUserId) => {
       id: docSnap.id,
       user: userAccount,
     };
-  } else {
-    return {};
   }
+  return {};
 };
 
 export const getUserAccount = async (collectionName, userId) => {
@@ -114,28 +107,18 @@ export const getUserAccount = async (collectionName, userId) => {
 
   if (docSnap.exists()) {
     return docSnap.data();
-  } else {
-    return null;
   }
+  return null;
 };
 
 // tao keywords cho displayName, su dung cho search
 export const generateKeywords = (displayName) => {
-  // liet ke tat cac hoan vi. vd: name = ["David", "Van", "Teo"]
-  // => ["David", "Van", "Teo"], ["David", "Teo", "Van"], ["Teo", "David", "Van"],...
   const name = displayName.split(' ').filter((word) => word);
-
   const length = name.length;
   let flagArray = [];
   let result = [];
   let stringArray = [];
 
-  /**
-   * khoi tao mang flag false
-   * dung de danh dau xem gia tri
-   * tai vi tri nay da duoc su dung
-   * hay chua
-   **/
   for (let i = 0; i < length; i++) {
     flagArray[i] = false;
   }
