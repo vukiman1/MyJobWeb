@@ -13,9 +13,6 @@ const authService = {
       username: email,
       password: password,
       role_name: role_name,
-      // email: email,
-      // password: password,
-      // roleName: role_name,
     };
 
     return httpRequest.post(url, data);
