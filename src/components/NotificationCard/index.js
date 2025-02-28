@@ -44,7 +44,6 @@ const NotificationCard = () => {
   const [count, setCount] = React.useState(0);
   const [badgeCount, setBadgeCount] = React.useState(0);
   const [notifications, setNotifications] = React.useState([]);
-  const [lastKey, setLastKey] = React.useState(null);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
 
@@ -72,7 +71,6 @@ const NotificationCard = () => {
   React.useEffect(() => {
     // Giả lập danh sách thông báo rỗng
     setNotifications([]);
-    setLastKey(null);
     return () => {};
   }, [currentUser.id]);
 

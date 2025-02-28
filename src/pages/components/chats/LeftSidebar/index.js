@@ -15,7 +15,7 @@ import {
 } from 'firebase/firestore';
 import db from '../../../../configs/firebase-config';
 
-import NoDataCard from '../../../../components/NoDataCard';
+// import NoDataCard from '../../../../components/NoDataCard';
 import { ImageSvg15 } from '../../../../configs/constants';
 import { ChatContext } from '../../../../context/ChatProvider';
 import MuiImageCustom from '../../../../components/MuiImageCustom';

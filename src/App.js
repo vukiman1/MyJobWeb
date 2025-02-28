@@ -84,6 +84,8 @@ import ScrollToTop from './components/ScrollToTop';
 
 // chat
 import ChatPage from './pages/chatPages/ChatPage';
+import PaymentPage from './pages/employerPages/PaymentPage';
+import AdvertisingPage from './pages/employerPages/AdvertisingPage';
 
 const mode = 'light';
 function App() {
@@ -372,6 +374,8 @@ function App() {
                   <Route path="thong-bao" element={<NotificationPage />} />
                   <Route path="tai-khoan" element={<EmployerAccountPage />} />
                   <Route path="cai-dat" element={<EmployerSettingPage />} />
+                  <Route path="thanh-toan" element={<PaymentPage />} />
+                  <Route path="dich-vu" element={<AdvertisingPage />} />
                 </Route>
                 {/* End: Employer */}
                 {/* Start: Auth */}

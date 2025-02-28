@@ -28,7 +28,6 @@ import Message from '../Message';
 import { ROLES_NAME } from '../../../../configs/constants';
 import {
   addDocument,
-  getChatRoomById,
   updateChatRoomByPartnerId,
 } from '../../../../services/firebaseService';
 import ChatInfo from '../../../../components/chats/ChatInfo';
@@ -43,14 +42,10 @@ const ChatWindow = () => {
   const messageListRef = React.useRef(null);
   const [inputValue, setInputValue] = React.useState('');
 
-  const [selectedRoom, setSelectedRoom] = React.useState({});
-  const [partnerId, setPartnerId] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [hasMore, setHasMore] = React.useState(true);
   const [lastDocument, setLastDocument] = React.useState(null);
   const [messages, setMessages] = React.useState([]);
-  const [page, setPage] = React.useState(1);
-  const [count, setCount] = React.useState(0);
 
   // cap nhat unreadCount
   React.useEffect(() => {
@@ -83,7 +78,7 @@ const ChatWindow = () => {
       );
 
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        setCount(querySnapshot?.size || 0);
+        setIsLoading(false);
       }, (error) => {
         console.error("Error getting message count:", error);
         setIsLoading(false);
@@ -175,7 +170,6 @@ const ChatWindow = () => {
       if (querySnapshot.docs.length > 0) {
         setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
         setMessages(prev => [...prev, ...messagesData]);
-        setPage(prev => prev + 1);
       } else {
         setHasMore(false);
       }
@@ -200,9 +194,6 @@ const ChatWindow = () => {
           userId: `${currentUserChat?.userId}`,
           roomId: selectedRoomId,
         });
-
-        // cap nhat chat room
-        await updateChatRoomByPartnerId(partnerId, selectedRoomId);
 
         setInputValue('');
         if (inputRef?.current) {
@@ -236,15 +227,15 @@ const ChatWindow = () => {
           <Stack>
             {currentUserChat?.roleName === ROLES_NAME.JOB_SEEKER ? (
               <ChatInfo.HeaderChatInfo
-                avatarUrl={selectedRoom?.user?.avatarUrl}
-                title={selectedRoom?.user?.name}
-                subTitle={selectedRoom?.user?.company?.companyName}
+                avatarUrl={''}
+                title={''}
+                subTitle={''}
               />
             ) : (
               <ChatInfo.HeaderChatInfo
-                avatarUrl={selectedRoom?.user?.avatarUrl}
-                title={selectedRoom?.user?.name}
-                subTitle={selectedRoom?.user?.email}
+                avatarUrl={''}
+                title={''}
+                subTitle={''}
               />
             )}
           </Stack>
@@ -266,24 +257,20 @@ const ChatWindow = () => {
               ) : messages.length === 0 ? (
                 currentUserChat?.roleName === ROLES_NAME.JOB_SEEKER ? (
                   <ChatInfo
-                    avatarUrl={selectedRoom?.user?.avatarUrl}
-                    title={selectedRoom?.user?.name}
-                    subTitle={selectedRoom?.user?.company?.companyName}
+                    avatarUrl={''}
+                    title={''}
+                    subTitle={''}
                     description={
-                      selectedRoom?.createdBy !== `${currentUserChat?.userId}`
-                        ? `${selectedRoom?.user?.company?.companyName} đã kết nối với bạn.`
-                        : `Bạn đã kết nối đến ${selectedRoom?.user?.company?.companyName}`
+                      ''
                     }
                   />
                 ) : (
                   <ChatInfo
-                    avatarUrl={selectedRoom?.user?.avatarUrl}
-                    title={selectedRoom?.user?.name}
-                    subTitle={selectedRoom?.user?.email}
+                    avatarUrl={''}
+                    title={''}
+                    subTitle={''}
                     description={
-                      selectedRoom?.createdBy !== `${currentUserChat?.userId}`
-                        ? `${selectedRoom?.user?.name} đã kết nối với bạn.`
-                        : `Bạn đã kết nối đến ${selectedRoom?.user?.name}`
+                      ''
                     }
                   />
                 )
@@ -327,7 +314,7 @@ const ChatWindow = () => {
                         avatarUrl={
                           `${currentUserChat?.userId}` === `${value?.userId}`
                             ? currentUserChat?.avatarUrl
-                            : selectedRoom?.user?.avatarUrl
+                            : ''
                         }
                         createdAt={value?.createdAt}
                       />

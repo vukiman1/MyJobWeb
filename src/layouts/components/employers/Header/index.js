@@ -31,7 +31,52 @@ const Header = ({ drawerWidth, handleDrawerToggle }) => {
   };
 
   const authArea = (
-    <Box sx={{ flexGrow: 0, ml: 1 }}>
+    <Box sx={{ flexGrow: 0, ml: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
+      {/* Balance Display */}
+      <Card
+        variant="outlined"
+        sx={{
+          p: '6px 16px',
+          borderRadius: 50,
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          borderColor: '#7e57c2',
+          backdropFilter: 'blur(8px)',
+          display: {
+            xs: 'none',
+            sm: 'flex',
+          },
+          alignItems: 'center',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.15)',
+            transform: 'translateY(-1px)',
+          },
+        }}
+      >
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'white',
+              opacity: 0.9,
+              fontWeight: 500,
+            }}
+          >
+            Số dư:
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              color: 'white',
+              fontWeight: 'bold',
+              textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+            }}
+          >
+            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(currentUser?.balance || 0)}
+          </Typography>
+        </Stack>
+      </Card>
+
       <Card
         variant="outlined"
         onClick={handleOpenUserMenu}

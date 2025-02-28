@@ -12,57 +12,6 @@ import MuiImageCustom from '../../../../components/MuiImageCustom';
 import myjobService from '../../../../services/myjobService';
 
 const RenderItem = ({ item }) => {
-  const [location, setLocation] = React.useState({
-    position: 'absolute',
-    left: 10,
-    bottom: 20,
-    right: null,
-    top: null,
-  });
-
-  React.useMemo(() => {
-    switch (item.descriptionLocation) {
-      case 1:
-        setLocation({
-          position: 'absolute',
-          left: 10,
-          bottom: null,
-          right: null,
-          top: 20,
-        });
-        break;
-      case 2:
-        setLocation({
-          position: 'absolute',
-          left: null,
-          bottom: null,
-          right: 10,
-          top: 20,
-        });
-        break;
-      case 3:
-        setLocation({
-          position: 'absolute',
-          left: 10,
-          bottom: 20,
-          right: null,
-          top: null,
-        });
-        break;
-      case 4:
-        setLocation({
-          position: 'absolute',
-          left: null,
-          bottom: 20,
-          right: 10,
-          top: null,
-        });
-        break;
-      default:
-        break;
-    }
-  }, [item]);
-
   return (
     <MuiImageCustom
       width="100%"

@@ -23,7 +23,7 @@ export const MyJobChatBot = () => {
     intent="WELCOME"
     chat-title="${chatbotConfig.CHAT_TITLE}"
     agent-id="${chatbotConfig.AGENT_ID}"
-    language-code="en"
+    language-code="vi"
     chat-icon="${chatbotConfig.CHAT_ICON}"
   ></df-messenger>`,
       }}
