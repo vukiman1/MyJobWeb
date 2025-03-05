@@ -74,12 +74,12 @@ const ROLES_NAME = {
 
 const HOME_FILTER_CAREER = [
   {
-    id: 9,
+    id: 8,
     name: 'IT - Phần mềm',
     titleIcon: <DevicesIcon color="secondary" />,
   },
   {
-    id: 8,
+    id: 7,
     name: 'IT - Phần cứng',
     titleIcon: <DeveloperBoardIcon color="secondary" />,
   },
