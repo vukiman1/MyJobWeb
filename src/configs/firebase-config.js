@@ -1,34 +1,23 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, serverTimestamp } from 'firebase/firestore';
- 
+import { serverTimestamp, initializeFirestore, CACHE_SIZE_UNLIMITED } from 'firebase/firestore';
 
-let firebaseConfig = {};
-if (process.env.NODE_ENV === 'production') {
-  // production
-  firebaseConfig = {
-    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.REACT_APP_FIREBASE_APP_ID,
-    databaseURL: process.env.FIREBASE_DATABASE_URL,
-  };
-} else {
-  // development
-  firebaseConfig = {
-    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.REACT_APP_FIREBASE_APP_ID,
-    measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
-  };
-}
+const firebaseConfig = {
+  apiKey: "AIzaSyCQEnkCoqlYeTJYjzmP09WGdBLQYfzWHsY",
+  authDomain: "vieclam365-c0e7c.firebaseapp.com",
+  projectId: "vieclam365-c0e7c",
+  storageBucket: "vieclam365-c0e7c.firebasestorage.app",
+  messagingSenderId: "1025345391934",
+  appId: "1:1025345391934:web:993ec6ab53818b42f3306f",
+  measurementId: "G-WNCN18N59N"
+};
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+
+// Initialize Firestore with settings
+const db = initializeFirestore(app, {
+  cacheSizeBytes: CACHE_SIZE_UNLIMITED
+});
 
 export { serverTimestamp };
 export default db;

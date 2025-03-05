@@ -1,5 +1,4 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import {
   Box,
   Stack,
@@ -29,7 +28,6 @@ import Message from '../Message';
 import { ROLES_NAME } from '../../../../configs/constants';
 import {
   addDocument,
-  getChatRoomById,
   updateChatRoomByPartnerId,
 } from '../../../../services/firebaseService';
 import ChatInfo from '../../../../components/chats/ChatInfo';
@@ -39,20 +37,15 @@ const LIMIT = 20;
 const messageCollectionRef = collection(db, 'messages');
 
 const ChatWindow = () => {
-  const { currentUser } = useSelector((state) => state.user);
   const { currentUserChat, selectedRoomId } = React.useContext(ChatContext);
   const inputRef = React.useRef(null);
   const messageListRef = React.useRef(null);
   const [inputValue, setInputValue] = React.useState('');
 
-  const [selectedRoom, setSelectedRoom] = React.useState({});
-  const [partnerId, setPartnerId] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [hasMore, setHasMore] = React.useState(true);
   const [lastDocument, setLastDocument] = React.useState(null);
   const [messages, setMessages] = React.useState([]);
-  const [page, setPage] = React.useState(1);
-  const [count, setCount] = React.useState(0);
 
   // cap nhat unreadCount
   React.useEffect(() => {
@@ -60,21 +53,15 @@ const ChatWindow = () => {
       const chatRoomDocRef = doc(db, 'chatRooms', `${selectedRoomId}`);
 
       const unsub = onSnapshot(chatRoomDocRef, (doc) => {
+        if (!doc.exists()) return;
+        
         const { recipientId, unreadCount } = doc.data();
-
         if (recipientId === `${currentUserChat.userId}` && unreadCount > 0) {
           updateDoc(chatRoomDocRef, {
             unreadCount: 0,
-          })
-            .then(() => {
-              console.log('update chatRoom success -> unreadCount=0');
-            })
-            .catch((error) => {
-              console.log(
-                'update chatRoom failed: -> unreadCount: Notchange',
-                error
-              );
-            });
+          }).catch((error) => {
+            console.log('update chatRoom failed:', error);
+          });
         }
       });
 
@@ -82,20 +69,7 @@ const ChatWindow = () => {
     }
   }, [currentUserChat, selectedRoomId]);
 
-  // lay thong tin partner
-  React.useEffect(() => {
-    const getChatRoom = async (selectedRoomId, userId) => {
-      const selectRoom = await getChatRoomById(selectedRoomId, userId);
-
-      setSelectedRoom(selectRoom);
-      setPartnerId(selectRoom?.user?.userId);
-    };
-    if (selectedRoomId && currentUserChat) {
-      getChatRoom(selectedRoomId, currentUserChat.userId);
-    }
-  }, [selectedRoomId, currentUserChat]);
-
-  // lang nghe tong message
+  // lang nghe tong message 
   React.useEffect(() => {
     if (selectedRoomId) {
       const q = query(
@@ -103,30 +77,91 @@ const ChatWindow = () => {
         where('roomId', '==', `${selectedRoomId}`)
       );
 
-      const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-        setCount(querySnapshot?.size || 0);
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        setIsLoading(false);
+      }, (error) => {
+        console.error("Error getting message count:", error);
+        setIsLoading(false);
       });
 
-      return () => {
-        unsubscribe();
-      };
+      return () => unsubscribe();
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedRoomId]);
 
   // danh sach messages
   React.useEffect(() => {
+    if (!selectedRoomId) {
+      setMessages([]);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
 
-    let q = query(
-      messageCollectionRef,
-      where('roomId', '==', `${selectedRoomId}`),
-      orderBy('createdAt', 'desc'),
-      limit(LIMIT)
-    );
+    try {
+      let q = query(
+        messageCollectionRef,
+        where('roomId', '==', `${selectedRoomId}`),
+        orderBy('createdAt', 'desc'),
+        limit(LIMIT)
+      );
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        try {
+          const messagesData = querySnapshot.docs
+            .map(doc => {
+              const data = doc.data();
+              return {
+                ...data,
+                id: doc.id,
+                createdAt: data.createdAt?.toDate() // Convert Firestore Timestamp to JS Date
+              };
+            })
+            .sort((a, b) => (a.createdAt?.getTime() || 0) - (b.createdAt?.getTime() || 0)); // Sort by timestamp
+
+          if (querySnapshot.docs.length > 0) {
+            setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
+          } else {
+            setLastDocument(null);
+          }
+
+          setMessages(messagesData);
+          setIsLoading(false);
+
+          // Scroll to bottom for new messages
+          if (messageListRef.current) {
+            messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+          }
+        } catch (error) {
+          console.error("Error processing messages:", error);
+          setIsLoading(false);
+        }
+      }, (error) => {
+        console.error("Error getting messages:", error);
+        setIsLoading(false);
+      });
+
+      return () => unsubscribe();
+    } catch (error) {
+      console.error("Error setting up messages listener:", error);
+      setIsLoading(false);
+    }
+  }, [selectedRoomId]);
+
+  // tai them du lieu
+  const handleLoadMore = async () => {
+    if (!lastDocument || !hasMore) return;
+
+    try {
+      const q = query(
+        messageCollectionRef,
+        where('roomId', '==', `${selectedRoomId}`),
+        orderBy('createdAt', 'desc'),
+        startAfter(lastDocument),
+        limit(LIMIT)
+      );
+
+      const querySnapshot = await getDocs(q);
       const messagesData = querySnapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
@@ -134,48 +169,12 @@ const ChatWindow = () => {
 
       if (querySnapshot.docs.length > 0) {
         setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
+        setMessages(prev => [...prev, ...messagesData]);
+      } else {
+        setHasMore(false);
       }
-
-      setMessages(messagesData);
-      setPage(1);
-      setHasMore(true);
-      setIsLoading(false);
-    });
-
-    return () => unsubscribe();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedRoomId]);
-
-  // tai them du lieu
-  const handleLoadMore = () => {
-    const getMoreData = async () => {
-      if (lastDocument !== null) {
-        const q = query(
-          messageCollectionRef,
-          where('roomId', '==', `${selectedRoomId}`),
-          orderBy('createdAt', 'desc'),
-          startAfter(lastDocument),
-          limit(LIMIT)
-        );
-
-        const querySnapshot = await getDocs(q);
-        if (querySnapshot.docs.length > 0) {
-          setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
-        }
-        const messagesData = querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }));
-
-        setMessages([...messages, ...messagesData]);
-      }
-    };
-
-    if (Math.ceil(count / LIMIT) > page) {
-      setPage(page + 1);
-      getMoreData();
-    } else {
+    } catch (error) {
+      console.error("Error loading more messages:", error);
       setHasMore(false);
     }
   };
@@ -184,26 +183,24 @@ const ChatWindow = () => {
     setInputValue(e.target.value);
   };
 
-  const handleOnSubmit = (e) => {
+  const handleOnSubmit = async (e) => {
     e.preventDefault();
 
     if (inputValue.trim() !== '') {
-      // them message
-      addDocument('messages', {
-        text: inputValue,
-        userId: `${currentUserChat?.userId}`,
-        roomId: selectedRoomId,
-      });
-
-      // cap nhat chat room
-      updateChatRoomByPartnerId(partnerId, selectedRoomId);
-
-      setInputValue('');
-
-      if (inputRef?.current) {
-        setTimeout(() => {
-          inputRef.current.focus();
+      try {
+        // them message
+        await addDocument('messages', {
+          text: inputValue,
+          userId: `${currentUserChat?.userId}`,
+          roomId: selectedRoomId,
         });
+
+        setInputValue('');
+        if (inputRef?.current) {
+          inputRef.current.focus();
+        }
+      } catch (error) {
+        console.error("Error sending message:", error);
       }
     }
   };
@@ -228,17 +225,17 @@ const ChatWindow = () => {
       <Card>
         {selectedRoomId && (
           <Stack>
-            {currentUser?.roleName === ROLES_NAME.JOB_SEEKER ? (
+            {currentUserChat?.roleName === ROLES_NAME.JOB_SEEKER ? (
               <ChatInfo.HeaderChatInfo
-                avatarUrl={selectedRoom?.user?.avatarUrl}
-                title={selectedRoom?.user?.name}
-                subTitle={selectedRoom?.user?.company?.companyName}
+                avatarUrl={''}
+                title={''}
+                subTitle={''}
               />
             ) : (
               <ChatInfo.HeaderChatInfo
-                avatarUrl={selectedRoom?.user?.avatarUrl}
-                title={selectedRoom?.user?.name}
-                subTitle={selectedRoom?.user?.email}
+                avatarUrl={''}
+                title={''}
+                subTitle={''}
               />
             )}
           </Stack>
@@ -258,26 +255,22 @@ const ChatWindow = () => {
                   <CircularProgress color="secondary" sx={{ margin: 'auto' }} />
                 </Stack>
               ) : messages.length === 0 ? (
-                currentUser?.roleName === ROLES_NAME.JOB_SEEKER ? (
+                currentUserChat?.roleName === ROLES_NAME.JOB_SEEKER ? (
                   <ChatInfo
-                    avatarUrl={selectedRoom?.user?.avatarUrl}
-                    title={selectedRoom?.user?.name}
-                    subTitle={selectedRoom?.user?.company?.companyName}
+                    avatarUrl={''}
+                    title={''}
+                    subTitle={''}
                     description={
-                      selectedRoom?.createdBy !== `${currentUserChat?.userId}`
-                        ? `${selectedRoom?.user?.company?.companyName} đã kết nối với bạn.`
-                        : `Bạn đã kết nối đến ${selectedRoom?.user?.company?.companyName}`
+                      ''
                     }
                   />
                 ) : (
                   <ChatInfo
-                    avatarUrl={selectedRoom?.user?.avatarUrl}
-                    title={selectedRoom?.user?.name}
-                    subTitle={selectedRoom?.user?.email}
+                    avatarUrl={''}
+                    title={''}
+                    subTitle={''}
                     description={
-                      selectedRoom?.createdBy !== `${currentUserChat?.userId}`
-                        ? `${selectedRoom?.user?.name} đã kết nối với bạn.`
-                        : `Bạn đã kết nối đến ${selectedRoom?.user?.name}`
+                      ''
                     }
                   />
                 )
@@ -321,7 +314,7 @@ const ChatWindow = () => {
                         avatarUrl={
                           `${currentUserChat?.userId}` === `${value?.userId}`
                             ? currentUserChat?.avatarUrl
-                            : selectedRoom?.user?.avatarUrl
+                            : ''
                         }
                         createdAt={value?.createdAt}
                       />

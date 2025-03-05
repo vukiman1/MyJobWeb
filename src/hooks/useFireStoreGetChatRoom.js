@@ -18,66 +18,83 @@ const useFireStoreGetChatRoom = (
   limitNum = null
 ) => {
   const [docs, setDocs] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
-    const collectionRef = collection(db, 'chatRooms');
-    let q = query(
-      collectionRef,
-      orderBy('createdAt', sort),
-      limitNum && limit(limitNum)
-    );
+    let unsubscribe = () => {};
 
-    if (condition) {
-      if (!condition.compareValue) {
-        setDocs([]);
-        return;
-      }
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const collectionRef = collection(db, 'chatRooms');
+        let q = query(
+          collectionRef,
+          orderBy('createdAt', sort),
+          limitNum && limit(limitNum)
+        );
 
-      q = query(
-        collectionRef,
-        where(condition.fieldName, condition.operator, condition.compareValue),
-        orderBy('createdAt', sort),
-        limitNum && limit(limitNum)
-      );
-    }
-
-    const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-      let chatRoomsData = [];
-
-      const promises = querySnapshot.docs.map(async (doc) => {
-        try {
-          let partnerId = '';
-          const chatRoomData = doc.data();
-
-          if (chatRoomData?.userId1 === `${userId}`) {
-            partnerId = chatRoomData?.userId2;
-          } else {
-            partnerId = chatRoomData?.userId1;
+        if (condition) {
+          if (!condition.compareValue) {
+            setDocs([]);
+            setIsLoading(false);
+            return;
           }
 
-          const userAccount = await getUserAccount('accounts', `${partnerId}`);
-
-          chatRoomsData.push({
-            ...chatRoomData,
-            id: doc.id,
-            user: userAccount,
-          });
-        } catch (error) {
-          console.error(error);
+          q = query(
+            collectionRef,
+            where(condition.fieldName, condition.operator, condition.compareValue),
+            orderBy('createdAt', sort),
+            limitNum && limit(limitNum)
+          );
         }
-      });
 
-      await Promise.all(promises);
+        unsubscribe = onSnapshot(q, async (querySnapshot) => {
+          try {
+            const chatRoomsData = [];
+            const promises = querySnapshot.docs.map(async (doc) => {
+              let partnerId = '';
+              const chatRoomData = doc.data();
 
-      setDocs(chatRoomsData);
-    });
+              if (chatRoomData?.userId1 === `${userId}`) {
+                partnerId = chatRoomData?.userId2;
+              } else {
+                partnerId = chatRoomData?.userId1;
+              }
 
-    return unsubscribe;
+              const userAccount = await getUserAccount('accounts', `${partnerId}`);
+              
+              chatRoomsData.push({
+                ...chatRoomData,
+                id: doc.id,
+                user: userAccount,
+              });
+            });
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [condition, sort]);
+            await Promise.all(promises);
+            setDocs(chatRoomsData);
+          } catch (error) {
+            console.error('Error processing chat room data:', error);
+          } finally {
+            setIsLoading(false);
+          }
+        }, (error) => {
+          console.error('Error getting chat rooms:', error);
+          setIsLoading(false);
+        });
+      } catch (error) {
+        console.error('Error setting up chat room listener:', error);
+        setIsLoading(false);
+      }
+    };
 
-  return docs;
+    fetchData();
+
+    return () => {
+      unsubscribe();
+    };
+  }, [condition, userId, sort, limitNum]);
+
+  return { docs, isLoading };
 };
 
 export default useFireStoreGetChatRoom;

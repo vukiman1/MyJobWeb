@@ -24,7 +24,7 @@ import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNone
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-
+import FilterVintageIcon from '@mui/icons-material/FilterVintage';
 import { IMAGES } from '../../../../configs/constants';
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
@@ -58,7 +58,7 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
 }));
 
 function StyledTreeItem(props) {
-  const { labelIcon: LabelIcon, labelText, ...other } = props;
+  const { labelIcon: LabelIcon, labelText, isVip, ...other } = props;
 
   return (
     <StyledTreeItemRoot
@@ -67,9 +67,26 @@ function StyledTreeItem(props) {
           <Box component={LabelIcon} color="inherit" sx={{ mr: 1 }} />
           <Typography
             variant="body2"
-            sx={{ fontWeight: 'inherit', flexGrow: 1 }}
+            sx={{ fontWeight: 'inherit', flexGrow: 1, display: 'flex', alignItems: 'center', gap: 1 }}
           >
             {labelText}
+            {isVip && (
+              <Box
+                component="span"
+                sx={{
+                  backgroundColor: 'rgba(68, 29, 160, 0.9)',
+                  color: '#fff',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  fontSize: '0.75rem',
+                  fontWeight: 'bold',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                }}
+              >
+                VIP
+              </Box>
+            )}
           </Typography>
         </Box>
       }
@@ -82,8 +99,8 @@ StyledTreeItem.propTypes = {
   bgColor: PropTypes.string,
   color: PropTypes.string,
   labelIcon: PropTypes.elementType.isRequired,
-  labelInfo: PropTypes.string,
   labelText: PropTypes.string.isRequired,
+  isVip: PropTypes.bool,
 };
 
 const drawer = (location, theme) => (
@@ -273,6 +290,43 @@ const drawer = (location, theme) => (
               nodeId="14"
               labelText="Cài đặt"
               labelIcon={SettingsOutlinedIcon}
+            />
+          </NavLink>
+          <NavLink
+            to="/nha-tuyen-dung/thanh-toan"
+            style={{
+              textDecoration: 'none',
+              display: 'block',
+              backgroundColor:
+                location.pathname === '/nha-tuyen-dung/thanh-toan'
+                  ? 'rgba(68, 29, 160, 0.08)'
+                  : 'inherit',
+            }}
+          >
+            <StyledTreeItem
+              nodeId="15"
+              labelText="Premium (Vip)"
+              labelIcon={FilterVintageIcon}
+              isVip={true}
+            />
+          </NavLink>
+
+          <NavLink
+            to="/nha-tuyen-dung/dich-vu"
+            style={{
+              textDecoration: 'none',
+              display: 'block',
+              backgroundColor:
+                location.pathname === '/nha-tuyen-dung/dich-vu'
+                  ? 'rgba(68, 29, 160, 0.08)'
+                  : 'inherit',
+            }}
+          >
+            <StyledTreeItem
+              nodeId="16"
+              labelText="Dịch vụ"
+              labelIcon={FilterVintageIcon}
+              isVip={true}
             />
           </NavLink>
         </StyledTreeItem>
