@@ -125,6 +125,13 @@ const ABOUT_IMAGES = {
   PROFILE: require('../assets/images/about-images/profile-img.png'),
 };
 
+const PAYMENT_IMAGES = {
+  PAYPAL: require('../assets/images/payment-images/paypal.png'),
+  MOMO: require('../assets/images/payment-images/momo.png'),
+  QRCODE: require('../assets/images/payment-images/qr code.png'),
+  VNPAY: require('../assets/images/payment-images/vnpay.png'),
+};
+
 const ICONS = {
   INSTAGRAM: require('../assets/icons/instagram-icon.png'),
   FACEBOOK: require('../assets/icons/facebook-icon.png'),
@@ -168,6 +175,7 @@ export {
   DATE_OPTIONS,
   IMAGES,
   ABOUT_IMAGES,
+  PAYMENT_IMAGES,
   LINKS,
   ICONS,
   BANNER_TYPE,

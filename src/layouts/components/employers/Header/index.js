@@ -72,7 +72,7 @@ const Header = ({ drawerWidth, handleDrawerToggle }) => {
               textShadow: '0 1px 2px rgba(0,0,0,0.1)',
             }}
           >
-            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(currentUser?.balance || 0)}
+            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(currentUser?.money || 0)}
           </Typography>
         </Stack>
       </Card>
