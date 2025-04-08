@@ -1,6 +1,21 @@
 import httpRequest from '../utils/httpRequest';
 
 const myjobService = {
+
+  async getPopup()  {
+    const url = '/api/myjob/web/popup/';
+    return httpRequest.get(url);
+  },
+
+  createUserBanner(data) {
+    const url = '/api/myjob/web/banner/user/';
+    return httpRequest.post(url, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+
   getFeedbacks: () => {
     const url = '/api/myjob/web/feedbacks/';
 

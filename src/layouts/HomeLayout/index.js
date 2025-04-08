@@ -6,10 +6,13 @@ import Header from '../components/commons/Header';
 import SubHeader from '../components/commons/SubHeader';
 import TopSlide from '../components/commons/TopSlide';
 import Footer from '../components/commons/Footer';
+import PopupAdsSlider from '../components/popup/PopupAdsSlider';
 
 const HomeLayout = () => {
   return (
     <Box>
+      <PopupAdsSlider/>
+
       <Header />
       <SubHeader />
       <Container

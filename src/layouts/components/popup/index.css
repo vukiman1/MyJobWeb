@@ -1,0 +1,16 @@
+/* Optional: Add this to your global CSS if you want custom styling for the popup */
+.swiper-pagination {
+  position: absolute;
+  bottom: 16px !important;
+  z-index: 20;
+}
+
+.swiper-pagination-bullet {
+  background: white !important;
+  opacity: 0.5 !important;
+}
+
+.swiper-pagination-bullet-active {
+  opacity: 1 !important;
+}
+

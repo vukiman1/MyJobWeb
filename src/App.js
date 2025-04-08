@@ -86,6 +86,7 @@ import ScrollToTop from './components/ScrollToTop';
 import ChatPage from './pages/chatPages/ChatPage';
 import PaymentPage from './pages/employerPages/PaymentPage';
 import AdvertisingPage from './pages/employerPages/AdvertisingPage';
+import PopupAdsSlider from './layouts/components/popup/PopupAdsSlider'
 
 const mode = 'light';
 function App() {
@@ -269,6 +270,7 @@ function App() {
             <BackdropLoading bgColor="white" />
           ) : (
             <Routes>
+              {/* <PopupAdsSlider/> */}
               <Route path="/" element={<Outlet />}>
                 {/* Start: Home */}
                 <Route path="" element={<HomeLayout />}>

@@ -53,6 +53,16 @@ const companyService = {
 
     return httpRequest.get(url);
   },
+
+  getJobList: (userId = {}) => {
+    const url = `/api/admin-job/list/${userId}/`;
+    return httpRequest.get(url);
+  },
+
+  setUrgentJob: (ids) => {
+    const url = `/api/admin-job/update-urgent`;
+    return httpRequest.put(url, {ids});
+  }
 };
 
 export default companyService;

@@ -457,9 +457,9 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }) => {
             control={control}
           />
         </Grid>
-        <Grid item xs={12}>
-          <CheckboxCustom name="isUrgent" control={control} title="Tuyển gấp" />
-        </Grid>
+        {/* <Grid item xs={12}>
+          <CheckboxCustom disabled name="isUrgent" control={control} title="Tuyển gấp" />
+        </Grid> */}
       </Grid>
     </form>
   );

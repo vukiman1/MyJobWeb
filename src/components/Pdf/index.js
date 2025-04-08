@@ -17,7 +17,7 @@ const Pdf = ({ fileUrl, title = '' }) => {
   const zoomPluginInstance = zoomPlugin();
   const getFilePluginInstance = getFilePlugin({
     fileNameGenerator: (file) => {
-      return `MyJob_CV-${toSlug(title)}`;
+      return `CV-${toSlug(title)}`;
     },
   });
 

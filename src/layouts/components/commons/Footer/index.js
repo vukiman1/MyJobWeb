@@ -32,7 +32,7 @@ const Footer = () => {
               <ListItemText
                 sx={{ cursor: 'pointer' }}
                 onClick={() => nav('/ve-chung-toi')}
-                primary="Về MyJob"
+                primary="Về Việc làm 365"
               />
             </ListItem>
             <ListItem>

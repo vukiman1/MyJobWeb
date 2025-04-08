@@ -13,7 +13,7 @@ import CircleNotificationsIcon from "@mui/icons-material/CircleNotifications";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
 
 const tabItems = [
-  { id: 1, label: "My MyJob", icon: <DashboardIcon />, path: "/ung-vien" },
+  { id: 1, label: "Trang chủ", icon: <DashboardIcon />, path: "/ung-vien" },
   {
     id: 2,
     label: "Hồ sơ xin việc",

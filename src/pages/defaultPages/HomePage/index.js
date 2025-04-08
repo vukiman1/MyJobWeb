@@ -26,7 +26,7 @@ import FilterJobPostCard from '../../components/defaults/FilterJobPostCard';
 import SuggestedJobPostCard from '../../components/defaults/SuggestedJobPostCard';
 
 export default function HomePage() {
-  TabTitle("Tìm việc nhanh, tuyển dụng hiệu quả tại MyJob")
+  TabTitle("Tìm việc nhanh, tuyển dụng hiệu quả")
   const { isAuthenticated, currentUser } = useSelector((state) => state.user);
   const nav = useNavigate()
 

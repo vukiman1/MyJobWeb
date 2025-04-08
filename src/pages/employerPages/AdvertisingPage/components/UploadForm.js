@@ -24,6 +24,7 @@ const UploadForm = ({
   onSubmit, 
   error 
 }) => {
+  const [url, setUrl] = React.useState('');
   return (
     <Collapse in={isOpen}>
       <Paper sx={{ p: 3, mt: 2, bgcolor: 'rgba(68, 29, 160, 0.03)' }}>
@@ -53,6 +54,8 @@ const UploadForm = ({
             label="Đường dẫn liên kết (URL)"
             variant="outlined"
             size="small"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
           />
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="body1">
@@ -61,7 +64,7 @@ const UploadForm = ({
             <Button
               variant="contained"
               color="primary"
-              onClick={() => onSubmit(serviceType, price)}
+              onClick={() => onSubmit(serviceType, price, url)}
               disabled={!selectedImage}
             >
               Xác nhận

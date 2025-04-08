@@ -58,7 +58,7 @@ const AppIntroductionCard = () => {
           </Box>
           <Box>
             <Typography>
-              Tìm việc hiệu quả bằng cách tải MyJob về di động của bạn và sẵn
+              Tìm việc hiệu quả bằng cách tải Việc làm 365 về di động của bạn và sẵn
               sàng nhận việc làm ngay hôm nay!
             </Typography>
           </Box>
