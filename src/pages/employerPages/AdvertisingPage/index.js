@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Grid, Stack } from '@mui/material';
+import { Grid, Stack, Backdrop, CircularProgress } from '@mui/material';
 import ImageIcon from '@mui/icons-material/Image';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import Swal from 'sweetalert2'; // 👈 Thêm dòng này
 
 import { TabTitle } from '../../../utils/generalFunction';
 import BalanceDisplay from './components/BalanceDisplay';
@@ -19,15 +20,16 @@ const AdvertisingPage = () => {
   const [openPopupForm, setOpenPopupForm] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
   const [purchaseHistory, setPurchaseHistory] = useState([
-    { id: 1, service: 'Banner Quảng cáo', date: '2024-02-12', price: 10000, status: 'Đang hoạt động' },
+    { id: 1, service: 'Banner Quảng cáo', date: '2024-02-12', price: 8000, status: 'Đang hoạt động' },
     { id: 2, service: 'Popup Quảng cáo', date: '2024-02-10', price: 8000, status: 'Đã kết thúc' },
     { id: 3, service: 'Đẩy tin tuyển dụng', date: '2024-02-08', price: 2000, status: 'Đang hoạt động' },
   ]);
 
-
   const handlePostSelection = (postId) => {
-    setSelectedPosts(prev => 
+    setSelectedPosts(prev =>
       prev.includes(postId)
         ? prev.filter(id => id !== postId)
         : [...prev, postId]
@@ -36,28 +38,52 @@ const AdvertisingPage = () => {
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
-    console.log(file)
     if (file) {
       setSelectedImage(file);
       setError('');
     }
   };
 
-  const handleServicePurchase = (serviceType, price, url) => {
-    console.log(url)
-    // alert(price)
-    myjobService.createUserBanner({
-      link: url,
-      file: selectedImage
-    })
+  const handleServicePurchase = async (serviceType, price, url) => {
     if ((currentUser?.money || 0) < price) {
       setError('Số dư không đủ để thực hiện giao dịch này');
       return;
     }
-    setError('');
-    setOpenBannerForm(false);
-    setOpenPopupForm(false);
-    setSelectedImage(null);
+
+    try {
+      setLoading(true);
+      await myjobService.createUserBanner({
+        link: url,
+        file: selectedImage,
+        type: serviceType
+      });
+
+      setError('');
+      setOpenBannerForm(false);
+      setOpenPopupForm(false);
+      setSelectedImage(null);
+
+      // 👇 Hiển thị thông báo thành công
+      Swal.fire({
+        icon: 'success',
+        title: 'Đã mua dịch vụ thành công!',
+        text: `Cảm ơn bạn đã sử dụng dịch vụ ${serviceType}.`,
+        confirmButtonText: 'Đóng',
+        confirmButtonColor: '#3085d6',
+        background: '#f0f9ff',
+        color: '#333',
+        customClass: {
+          popup: 'rounded-xl shadow-md',
+          title: 'text-lg font-semibold',
+        }
+      });
+
+    } catch (error) {
+      setError('Đã xảy ra lỗi khi mua dịch vụ');
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleStatusToggle = (id) => {
@@ -74,7 +100,6 @@ const AdvertisingPage = () => {
     );
   };
 
-  // Mock data for job posts
   const jobPosts = [
     { id: 1, title: 'Senior Frontend Developer', company: 'Tech Corp', date: '2024-02-12' },
     { id: 2, title: 'Backend Engineer', company: 'Digital Solutions', date: '2024-02-11' },
@@ -105,14 +130,18 @@ const AdvertisingPage = () => {
 
   return (
     <Stack spacing={3}>
-      {/* <BalanceDisplay balance={currentUser?.balance} /> */}
+      {/* Loading overlay */}
+      <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
 
+      {/* <BalanceDisplay balance={currentUser?.balance} /> */}
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
           <ServiceCard
             icon={ImageIcon}
             title="Quảng cáo Banner"
-            price={10000}
+            price={8000}
             description="Hiển thị hình ảnh của bạn ở vị trí banner đầu trang"
             features={bannerFeatures}
             isFormOpen={openBannerForm}

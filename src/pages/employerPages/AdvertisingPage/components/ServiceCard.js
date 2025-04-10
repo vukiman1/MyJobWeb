@@ -58,7 +58,7 @@ const ServiceCard = ({
         </Button>
       </Box>
       <UploadForm
-        serviceType={title}
+        serviceType={(title === "Quảng cáo Banner" ? "BANNER" : "POPUP")}
         price={price}
         isOpen={isFormOpen}
         onClose={onFormClose}

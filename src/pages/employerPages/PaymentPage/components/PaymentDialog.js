@@ -200,7 +200,7 @@ const PaymentDialog = ({
                   Giao dịch đã được xác nhận thành công
                 </Typography>
                 <Typography variant="body2">
-                  Số dư tài khoản của bạn đã được cập nhật. Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.
+                  Số dư tài khoản của bạn đã được cập nhật và được <b>tặng x10 giá trị nạp</b>. Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.
                 </Typography>
               </Alert>
             ) : (

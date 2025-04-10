@@ -239,7 +239,7 @@ const PaymentPage = () => {
                 }}
               >
                 <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-                  Chọn số tiền nạp
+                  Chọn số tiền nạp <b>(Ưu đãi x10 tài khoản)</b>
                 </Typography>
                 <AmountSelection
                   amounts={amounts}
