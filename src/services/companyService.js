@@ -62,6 +62,26 @@ const companyService = {
   setUrgentJob: (ids) => {
     const url = `/api/admin-job/update-urgent`;
     return httpRequest.put(url, {ids});
+  },
+
+  getPurchaseHistory() {
+    const url = `/api/payment/getHistory`
+    return httpRequest.get(url)
+  },
+
+  getPaymentServices() {
+    const url = `/api/myjob/payment-service`
+    return httpRequest.get(url)
+  },
+
+  updateBannerStatus(id) {
+    const url = `/api/myjob/banner-active/${id}`
+    return httpRequest.patch(url)
+  },
+
+  updateJobStatus(id) {
+    const url = `/api/myjob/jobpost-urgent/${id}`
+    return httpRequest.patch(url)
   }
 };
 
