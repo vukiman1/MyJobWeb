@@ -36,6 +36,11 @@ const myjobService = {
 
     return httpRequest.get(url, { params: params });
   },
+
+  async geNotification() {
+    const url = '/api/myjob/client-notifications/';
+    return httpRequest.get(url);
+  }
 };
 
 export default myjobService;

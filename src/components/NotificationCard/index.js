@@ -1,142 +1,191 @@
-import * as React from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import Moment from "react-moment";
-import "moment/locale/vi";
-import {
-  Badge,
-  Box,
-  Grid,
-  IconButton,
-  Menu,
-  Stack,
-  Typography,
-} from "@mui/material";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import ClearIcon from "@mui/icons-material/Clear";
+"use client"
 
-// Comment out Firebase imports
-/*
-import {
-  collection,
-  getDocs,
-  limit,
-  onSnapshot,
-  query,
-  where,
-  startAfter,
-  orderBy,
-  updateDoc,
-  doc,
-  writeBatch,
-} from 'firebase/firestore';
-import db from '../../configs/firebase-config';
-*/
+import * as React from "react"
+import { useSelector } from "react-redux"
+import { useNavigate } from "react-router-dom"
+import Moment from "react-moment"
+import "moment/locale/vi"
+import { Badge, Box, Grid, IconButton, Menu, Stack, Typography } from "@mui/material"
+import NotificationsIcon from "@mui/icons-material/Notifications"
+import ClearIcon from "@mui/icons-material/Clear"
 
-import { IMAGES } from "../../configs/constants";
-import MuiImageCustom from "../MuiImageCustom";
+import { IMAGES } from "../../configs/constants"
+import MuiImageCustom from "../MuiImageCustom"
+import myjobService from "../../services/myjobService"
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 5
 
 const NotificationCard = () => {
-  const nav = useNavigate();
-  const { currentUser } = useSelector((state) => state.user);
-  const [count, setCount] = React.useState(0);
-  const [badgeCount, setBadgeCount] = React.useState(0);
-  const [notifications, setNotifications] = React.useState([]);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
+  const nav = useNavigate()
+  const { currentUser } = useSelector((state) => state.user)
+  const [count, setCount] = React.useState(0)
+  const [badgeCount, setBadgeCount] = React.useState(0)
+  const [notifications, setNotifications] = React.useState([])
+  const [anchorEl, setAnchorEl] = React.useState(null)
+  const [page, setPage] = React.useState(1)
+  const [totalPages, setTotalPages] = React.useState(1)
+  const [loading, setLoading] = React.useState(false)
+  const open = Boolean(anchorEl)
 
   const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+    setAnchorEl(event.currentTarget)
+    // Load notifications when menu is opened
+    fetchNotifications()
+  }
 
-  
   const handleClose = () => {
-    setAnchorEl(null);
-  };
+    setAnchorEl(null)
+  }
 
-  React.useEffect(() => {
-    // Giả lập số thông báo chưa đọc
-    setBadgeCount(0);
-    return () => {};
-  }, [currentUser.id]);
+  // Fetch notifications from service
+  const fetchNotifications = async (loadMore = false) => {
+    if (loading) return
 
-  React.useEffect(() => {
-    // Giả lập tổng số thông báo
-    setCount(0);
-    return () => {};
-  }, [currentUser.id]);
+    try {
+      setLoading(true)
+      const currentPage = loadMore ? page + 1 : 1
 
-  React.useEffect(() => {
-    // Giả lập danh sách thông báo rỗng
-    setNotifications([]);
-    return () => {};
-  }, [currentUser.id]);
+      // Call your service
+      const response = await myjobService.geNotification({
+        page: currentPage,
+        limit: PAGE_SIZE,
+      })
 
-  const loadMore = async () => {
-    // Không làm gì cả
-    console.log("Load more disabled");
-  };
+      if (response.success) {
+        const { notifications: newNotifications, pagination } = response.data
 
-  const handleRemove = (key) => {
-    // Xóa thông báo khỏi state local
-    const index = notifications.findIndex((value) => value.key === key);
-    if (index > -1) {
-      let newNotifications = [...notifications];
-      newNotifications.splice(index, 1);
-      setNotifications(newNotifications);
+        if (loadMore) {
+          setNotifications([...notifications, ...newNotifications])
+        } else {
+          setNotifications(newNotifications)
+        }
+
+        setPage(pagination.currentPage)
+        setTotalPages(pagination.totalPages)
+        setCount(pagination.totalItems)
+        setBadgeCount(newNotifications.filter((n) => !n.read).length)
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error)
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
-  const handleRead = (key) => {
-    // Không làm gì cả
-    console.log("Read notification disabled");
-  };
+  // Load more notifications
+  const loadMore = () => {
+    if (page < totalPages) {
+      fetchNotifications(true)
+    }
+  }
 
+  // Mark notification as read
+  const handleRead = async (id) => {
+    try {
+      const response = await myjobService.markNotificationAsRead(id)
+
+      if (response.success) {
+        // Update local state
+        const index = notifications.findIndex((value) => value.id === id)
+        if (index > -1) {
+          const newNotifications = [...notifications]
+          newNotifications[index].read = true
+          setNotifications(newNotifications)
+          setBadgeCount((prev) => Math.max(0, prev - 1))
+        }
+      }
+    } catch (error) {
+      console.error("Error marking notification as read:", error)
+    }
+  }
+
+  // Remove a notification
+  const handleRemove = async (id) => {
+    try {
+      const response = await myjobService.deleteNotification(id)
+
+      if (response.success) {
+        // Remove from local state
+        const index = notifications.findIndex((value) => value.id === id)
+        if (index > -1) {
+          const newNotifications = [...notifications]
+          const removedNotification = newNotifications.splice(index, 1)[0]
+          setNotifications(newNotifications)
+
+          // Update counts
+          setCount((prev) => prev - 1)
+          if (!removedNotification.read) {
+            setBadgeCount((prev) => Math.max(0, prev - 1))
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error removing notification:", error)
+    }
+  }
+
+  // Remove all notifications
   const handleRemoveAll = async () => {
-    // Xóa tất cả thông báo khỏi state local
-    setNotifications([]);
-  };
+    try {
+      const response = await myjobService.deleteAllNotifications()
 
+      if (response.success) {
+        // Clear local state
+        setNotifications([])
+        setCount(0)
+        setBadgeCount(0)
+      }
+    } catch (error) {
+      console.error("Error removing all notifications:", error)
+    }
+  }
+
+  // Format date for display
+  const formatDate = (dateString) => {
+    try {
+      return new Date(dateString).getTime()
+    } catch (error) {
+      return Date.now()
+    }
+  }
+
+  // Handle notification click based on type
   const handleClickItem = (item) => {
     switch (item.type) {
       case "SYSTEM":
-        handleRead(item.key);
-        nav("/");
-        break;
+        handleRead(item.id)
+        nav("/")
+        break
       case "EMPLOYER_VIEWED_RESUME":
-        handleRead(item.key);
-        nav("/ung-vien/cong-ty-cua-toi");
-        break;
+        handleRead(item.id)
+        nav("/ung-vien/cong-ty-cua-toi")
+        break
       case "EMPLOYER_SAVED_RESUME":
-        handleRead(item.key);
-        nav("/ung-vien/cong-ty-cua-toi");
-        break;
+        handleRead(item.id)
+        nav("/ung-vien/cong-ty-cua-toi")
+        break
       case "APPLY_STATUS":
-        handleRead(item.key);
-        nav("/ung-vien/viec-lam-cua-toi");
-        break;
+        handleRead(item.id)
+        nav("/ung-vien/viec-lam-cua-toi")
+        break
       case "COMPANY_FOLLOWED":
-        handleRead(item.key);
-        nav("/nha-tuyen-dung/danh-sach-ung-vien");
-        break;
+        handleRead(item.id)
+        nav("/nha-tuyen-dung/danh-sach-ung-vien")
+        break
       case "POST_VERIFY_RESULT":
-        handleRead(item.key);
-        nav("/nha-tuyen-dung/tin-tuyen-dung");
-        break;
+        handleRead(item.id)
+        nav("/nha-tuyen-dung/tin-tuyen-dung")
+        break
       case "APPLY_JOB":
-        handleRead(item.key);
-        nav(
-          `/nha-tuyen-dung/chi-tiet-ung-vien/${item["APPLY_JOB"]?.resume_slug}`
-        );
-        break;
+        handleRead(item.id)
+        nav(`/nha-tuyen-dung/chi-tiet-ung-vien/${item.resumeSlug || ""}`)
+        break
       default:
-        break;
+        break
     }
 
-    handleClose();
-  };
+    handleClose()
+  }
 
   return (
     <React.Fragment>
@@ -146,6 +195,7 @@ const NotificationCard = () => {
           aria-label="show new notifications"
           color="inherit"
           onClick={handleClick}
+          className={badgeCount > 0 ? "pulse-animation" : ""}
         >
           <Badge badgeContent={badgeCount} color="error">
             <NotificationsIcon />
@@ -189,7 +239,11 @@ const NotificationCard = () => {
         <Box style={{ width: 500, maxHeight: 500 }} sx={{ py: 1, px: 1.5 }}>
           <Box style={{ overflowY: "auto", maxHeight: 450 }}>
             <Stack spacing={2} sx={{ p: 1 }}>
-              {notifications.length === 0 ? (
+              {loading && notifications.length === 0 ? (
+                <Typography textAlign="center" variant="body2" color="gray">
+                  Đang tải thông báo...
+                </Typography>
+              ) : notifications.length === 0 ? (
                 <Typography textAlign="center" variant="body2" color="gray">
                   Chưa có thông báo nào
                 </Typography>
@@ -204,16 +258,18 @@ const NotificationCard = () => {
                       boxShadow: 1,
                       p: 1,
                       borderRadius: 1.5,
+                      bgcolor: value?.read ? "transparent" : "rgba(25, 118, 210, 0.08)",
+                      transition: "all 0.2s ease",
+                      "&:hover": {
+                        bgcolor: "rgba(25, 118, 210, 0.12)",
+                      },
                     }}
                   >
-                    <Box
-                      sx={{ cursor: "pointer" }}
-                      onClick={() => handleClickItem(value)}
-                    >
+                    <Box sx={{ cursor: "pointer" }} onClick={() => handleClickItem(value)}>
                       <MuiImageCustom
                         width={65}
                         height={65}
-                        src={value?.image || IMAGES.notificationImageDefault}
+                        src={value?.imageUrl || IMAGES.notificationImageDefault}
                         sx={{
                           p: 0.5,
                           borderRadius: 1.5,
@@ -224,19 +280,14 @@ const NotificationCard = () => {
                         duration={500}
                       />
                     </Box>
-                    <Box
-                      sx={{ cursor: "pointer" }}
-                      flex={1}
-                      onClick={() => handleClickItem(value)}
-                    >
+                    <Box sx={{ cursor: "pointer" }} flex={1} onClick={() => handleClickItem(value)}>
                       <Stack>
                         <Box>
                           <Typography
                             variant="subtitle2"
                             fontSize={14}
                             style={{
-                              fontWeight:
-                                value?.is_read === true ? "normal" : "bold",
+                              fontWeight: value?.read === true ? "normal" : "bold",
                             }}
                           >
                             {value.title}
@@ -244,21 +295,15 @@ const NotificationCard = () => {
                         </Box>
                         <Box>
                           <Typography variant="caption" color="#616161">
-                            {value.content}
+                            {value.message}
                           </Typography>
                         </Box>
                         <Stack direction="row" justifyContent="space-between">
-                          <Typography
-                            variant="caption"
-                            fontSize={12}
-                            color="#bdbdbd"
-                          >
-                            <Moment fromNow>
-                              {value?.time?.seconds * 1000}
-                            </Moment>
+                          <Typography variant="caption" fontSize={12} color="#bdbdbd">
+                            <Moment fromNow>{formatDate(value.date)}</Moment>
                           </Typography>
                           <Typography variant="caption" fontSize={12}>
-                            {value?.is_read === true ? (
+                            {value?.read === true ? (
                               <span style={{ color: "#bdbdbd" }}>Đã đọc</span>
                             ) : (
                               <span style={{ color: "red" }}>Mới</span>
@@ -272,7 +317,10 @@ const NotificationCard = () => {
                         aria-label="delete"
                         color="error"
                         size="small"
-                        onClick={() => handleRemove(value.key)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleRemove(value.id)
+                        }}
                       >
                         <ClearIcon fontSize="small" />
                       </IconButton>
@@ -280,26 +328,27 @@ const NotificationCard = () => {
                   </Stack>
                 ))
               )}
+              {loading && notifications.length > 0 && (
+                <Typography textAlign="center" variant="body2" color="gray">
+                  Đang tải thêm...
+                </Typography>
+              )}
             </Stack>
           </Box>
           <Box>
             <Grid container>
               <Grid item xs={4}></Grid>
               <Grid item xs={4}>
-                {Math.ceil(count / PAGE_SIZE) > 1 && (
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="center"
-                  >
+                {!loading && notifications.length > 0 && page < totalPages && (
+                  <Stack direction="row" alignItems="center" justifyContent="center">
                     <Typography
                       fontWeight="bold"
                       textAlign="center"
-                      color="GrayText"
+                      color="primary"
+                      sx={{ cursor: "pointer" }}
+                      onClick={loadMore}
                     >
-                      <span style={{ cursor: "pointer" }} onClick={loadMore}>
-                        Xem thêm
-                      </span>
+                      Xem thêm
                     </Typography>
                   </Stack>
                 )}
@@ -309,15 +358,12 @@ const NotificationCard = () => {
                   <Stack direction="row" justifyContent="flex-end">
                     <Typography
                       variant="caption"
-                      color="red"
+                      color="error"
                       textAlign="center"
+                      sx={{ cursor: "pointer" }}
+                      onClick={handleRemoveAll}
                     >
-                      <span
-                        style={{ cursor: "pointer" }}
-                        onClick={handleRemoveAll}
-                      >
-                        Xóa tất cả
-                      </span>
+                      Xóa tất cả
                     </Typography>
                   </Stack>
                 )}
@@ -327,7 +373,7 @@ const NotificationCard = () => {
         </Box>
       </Menu>
     </React.Fragment>
-  );
-};
+  )
+}
 
-export default NotificationCard;
+export default NotificationCard

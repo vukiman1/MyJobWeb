@@ -38,6 +38,7 @@ const EmployerSignUp = () => {
         );
         nav('/email-verification-required');
       } catch (error) {
+        console.log(error)
         errorHandling(error);
       } finally {
         setIsFullScreenLoading(false);

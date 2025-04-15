@@ -217,7 +217,9 @@ const BoxProfile = ({ title }) => {
                       icon={<DownloadIcon />}
                       color="secondary"
                       label="Tải xuống"
-                      onClick={() => {}}
+                      onClick={() => {
+                        console.log('object')
+                      }}
                     />
                   )}
                 </PDFDownloadLink>

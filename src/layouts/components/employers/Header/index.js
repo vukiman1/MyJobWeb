@@ -150,7 +150,7 @@ const Header = ({ drawerWidth, handleDrawerToggle }) => {
           {/* End: NotificationCard */}
 
           {/* start: ChatCard */}
-          {isAuthenticated && <ChatCard />}
+          {/* {isAuthenticated && <ChatCard />} */}
           {/* End: ChatCard */}
 
           {/* Start: authArea */}

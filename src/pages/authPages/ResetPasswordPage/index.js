@@ -37,8 +37,8 @@ const ResetPasswordPage = () => {
           `${redirectLoginUrl}/?successMessage=Cập nhật mật khẩu thành công.`
         );
       } catch (error) {
-        const res = error.response;
-
+        const res = error.message;
+        console.log(error.message)
         switch (res.status) {
           case 400:
             const errors = res.data?.errors;

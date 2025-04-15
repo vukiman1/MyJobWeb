@@ -2,7 +2,7 @@ import httpRequest from '../utils/httpRequest';
 
 const jobService = {
   searchJobSuggestTitle: (kw) => {
-    const url = 'api/job/web/seach/job-suggest-title/';
+    const url = 'api/job/web/search/job-suggest-title/';
 
     return httpRequest.get(url, { params: { q: kw } });
   },

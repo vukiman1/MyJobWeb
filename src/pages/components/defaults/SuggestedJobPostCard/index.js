@@ -94,10 +94,10 @@ const SuggestedJobPostCard = ({ pageSize = 12, fullWidth = false }) => {
                   <JobPost
                     id={value.id}
                     slug={value.slug}
-                    companyImageUrl={value?.companyDict?.companyImageUrl}
-                    companyName={value?.companyDict?.companyName}
+                    companyImageUrl={value?.company?.companyImageUrl}
+                    companyName={value?.company?.companyName}
                     jobName={value?.jobName}
-                    cityId={value?.locationDict?.city}
+                    cityId={value?.location?.city}
                     deadline={value?.deadline}
                     isUrgent={value?.isUrgent}
                     isHot={value?.isHot}
